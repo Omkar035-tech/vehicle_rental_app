@@ -1,0 +1,20 @@
+{
+  "name": "vehicle_rental_system",
+  "version": "1.0.0",
+  "description": "A full-stack web application for seamless vehicle rental bookings, allowing users to easily select and reserve vehicles through an intuitive, step-by-step form interface.",
+  "homepage": "https://github.com/Omkar035-tech/vehicle_rental_app#readme",
+  "bugs": {
+    "url": "https://github.com/Omkar035-tech/vehicle_rental_app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Omkar035-tech/vehicle_rental_app.git"
+  },
+  "license": "ISC",
+  "author": "Omkar Apandkar",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
