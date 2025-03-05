@@ -15,7 +15,8 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon app.js",
+    "migrate": "sequelize-cli db:migrate"
   },
   "dependencies": {
     "cors": "^2.8.5",
