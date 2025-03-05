@@ -36,7 +36,7 @@ export default {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
-                    model: 'vehicles',
+                    model: 'vehicleInfo',
                     key: 'id'
                 },
                 onUpdate: 'CASCADE',
