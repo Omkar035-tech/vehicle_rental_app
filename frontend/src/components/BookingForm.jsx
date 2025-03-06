@@ -1,4 +1,3 @@
-// components/BookingForm.js
 import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -13,95 +12,14 @@ import {
     Stepper,
     Step,
     StepLabel,
-    CircularProgress
+    CircularProgress,
+    Alert
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import CustomRadioCardGroup from './RadioCard';
 import CustomDateRangePicker from './CustomDateRangePicker';
-
-// Dummy data for vehicle types
-const vehicleTypesData = [
-    {
-        "id": 1,
-        "name": "Hatchback",
-        "wheelCount": 4
-    },
-    {
-        "id": 2,
-        "name": "SUV",
-        "wheelCount": 4
-    },
-    {
-        "id": 3,
-        "name": "Sedan",
-        "wheelCount": 4
-    },
-    {
-        "id": 4,
-        "name": "Cruiser Bike",
-        "wheelCount": 2
-    }
-];
-
-// Dummy data for vehicle models
-const vehicleModelsData = [
-    {
-        "id": 1,
-        "model": "Civic",
-        "company": "Honda",
-        "releasedIn": 2022,
-        "dailyCost": "500.00",
-        "createdAt": "2025-03-06T12:04:38.506Z",
-        "updatedAt": "2025-03-06T12:04:38.506Z",
-        "vehicleDataId": 1,
-        "VehicleDatum": {
-            "name": "Hatchback",
-            "wheelCount": 4
-        }
-    },
-    {
-        "id": 2,
-        "model": "Tawero 350",
-        "company": "Royal",
-        "releasedIn": 2021,
-        "dailyCost": "400.00",
-        "createdAt": "2025-03-06T12:04:38.506Z",
-        "updatedAt": "2025-03-06T12:04:38.506Z",
-        "vehicleDataId": 4,
-        "VehicleDatum": {
-            "name": "Cruiser Bike",
-            "wheelCount": 2
-        }
-    },
-    {
-        "id": 3,
-        "model": "CR-V",
-        "company": "Honda",
-        "releasedIn": 2023,
-        "dailyCost": "800.00",
-        "createdAt": "2025-03-06T12:04:38.506Z",
-        "updatedAt": "2025-03-06T12:04:38.506Z",
-        "vehicleDataId": 2,
-        "VehicleDatum": {
-            "name": "SUV",
-            "wheelCount": 4
-        }
-    },
-    {
-        "id": 4,
-        "model": "Camry",
-        "company": "Toyota",
-        "releasedIn": 2022,
-        "dailyCost": "600.00",
-        "createdAt": "2025-03-06T12:04:38.506Z",
-        "updatedAt": "2025-03-06T12:04:38.506Z",
-        "vehicleDataId": 3,
-        "VehicleDatum": {
-            "name": "Sedan",
-            "wheelCount": 4
-        }
-    }
-];
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Sample images for wheel options
 const wheelOptions = [
@@ -125,7 +43,8 @@ const steps = [
     'Number of Wheels',
     'Type of Vehicle',
     'Specific Model',
-    'Booking Dates'
+    'Booking Dates',
+    'Confirmation'
 ];
 
 const BookingForm = () => {
@@ -133,6 +52,8 @@ const BookingForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [vehicleTypes, setVehicleTypes] = useState([]);
     const [vehicleModels, setVehicleModels] = useState([]);
+    const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
+    const [vehicleAvailable, setVehicleAvailable] = useState(null);
 
     // Form validation schema with Yup
     const validationSchema = Yup.object({
@@ -183,36 +104,105 @@ const BookingForm = () => {
                 const selectedType = vehicleTypes.find(type => type.id === values.vehicleTypeId);
                 const selectedModel = vehicleModels.find(model => model.id === values.vehicleModelId);
 
-                const bookingDetails = {
-                    ...values,
-                    vehicleType: selectedType?.name || '',
-                    vehicleModel: selectedModel ? `${selectedModel.company} ${selectedModel.model}` : '',
-                    dailyCost: selectedModel?.dailyCost || '0.00'
-                };
+                const DataToPost = {
+                    vehicleId: values.vehicleModelId,
+                    startDate: values.dateRange[0].toISOString().split('T')[0],
+                    endDate: values.dateRange[1].toISOString().split('T')[0],
+                    customerFirstName: values.firstName,
+                    customerLastName: values.lastName
+                }
 
-                console.log('Form submitted:', bookingDetails);
-                alert('Booking successful! Details: ' + JSON.stringify(bookingDetails, null, 2));
+                const response = await fetch("http://localhost:3001/api/bookings", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(DataToPost)
+                });
+                const data = await response.json();
+                console.log('Data:', data);
+
+                console.log('Form submitted:', DataToPost);
+                toast.success('Booking successful!');
                 setIsSubmitting(false);
                 // Reset form after submission
                 formik.resetForm();
                 setActiveStep(0);
+                setVehicleAvailable(null);
             } catch (error) {
                 console.error('Submission error:', error);
+                toast.error('Error submitting booking. Please try again.');
                 setIsSubmitting(false);
             }
         }
     });
+
+    // Check vehicle availability
+    const checkVehicleAvailability = async () => {
+        if (!formik.values.vehicleModelId || !formik.values.dateRange[0] || !formik.values.dateRange[1]) {
+            return false;
+        }
+
+        setIsCheckingAvailability(true);
+        try {
+            // Format dates for API call
+            const startDate = formik.values.dateRange[0].toISOString().split('T')[0];
+            const endDate = formik.values.dateRange[1].toISOString().split('T')[0];
+            const vehicleId = formik.values.vehicleModelId;
+
+            const params = new URLSearchParams({
+                startDate: startDate,
+                endDate: endDate,
+                vehicleId: vehicleId
+            });
+
+            // Simulate API call to check availability
+            // In a real app, this would be a fetch call to your backend
+            // Example: await fetch(`http://localhost:3001/api/vehicles/availability/${vehicleId}?startDate=${startDate}&endDate=${endDate}`)
+
+            const response = await fetch(`http://localhost:3001/api/bookings/check-availability?${params.toString()}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            console.log('Data:', data);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            const isAvailable = data.data.isAvailable;
+
+            setVehicleAvailable(isAvailable);
+
+            if (isAvailable) {
+                toast.success('Vehicle is available for the selected dates!');
+            } else {
+                toast.error('Sorry, this vehicle is not available for the selected dates.');
+            }
+
+            setIsCheckingAvailability(false);
+            return isAvailable;
+
+        } catch (error) {
+            console.error('Error checking availability:', error);
+            toast.error('Error checking vehicle availability. Please try again.');
+            setIsCheckingAvailability(false);
+            return false;
+        }
+    };
 
     // Update vehicle types when wheels selection changes
     useEffect(() => {
         const fetchVehicleTypes = async () => {
             if (formik.values.wheels) {
                 try {
-                    const response = await fetch('http://localhost:3001/api/vehicles/types');
-                    const data = await response.json();
-                    console.log(data.data);
-
                     const wheelCount = parseInt(formik.values.wheels);
+                    const params = new URLSearchParams({
+                        wheelCount: wheelCount,
+                    });
+                    const response = await fetch(`http://localhost:3001/api/vehicles/types?${params.toString()}`,
+                        { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+                    );
+                    const data = await response.json();
                     const filteredTypes = data.data.filter(type => type.wheelCount == wheelCount);
                     setVehicleTypes(filteredTypes);
 
@@ -229,17 +219,32 @@ const BookingForm = () => {
 
     // Update vehicle models when vehicle type changes
     useEffect(() => {
-        if (formik.values.vehicleTypeId) {
-            const typeId = formik.values.vehicleTypeId;
-            console.log('Selected vehicle type:', typeId);
-            const filteredModels = vehicleModelsData.filter(model => model.vehicleDataId == typeId);
-            console.log('Filtered models:', filteredModels);
-            setVehicleModels(filteredModels);
+        const fetchVehicleModels = async () => {
+            if (formik.values.vehicleTypeId) {
+                try {
+                    const typeId = formik.values.vehicleTypeId;
+                    const response = await fetch(`http://localhost:3001/api/vehicles/byType/${typeId}`,
+                        { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+                    );
+                    const data = await response.json();
+                    const filteredModels = data.data.filter(model => model.vehicleDataId == typeId);
+                    console.log('Filtered models:', filteredModels);
+                    setVehicleModels(filteredModels);
 
-            // Reset vehicle model when type changes
-            formik.setFieldValue('vehicleModelId', '');
-        }
+                    // Reset vehicle model when type changes
+                    formik.setFieldValue('vehicleModelId', '');
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        };
+        fetchVehicleModels();
     }, [formik.values.vehicleTypeId]);
+
+    // Reset vehicle availability when selection changes
+    useEffect(() => {
+        setVehicleAvailable(null);
+    }, [formik.values.vehicleModelId, formik.values.dateRange]);
 
     // Convert vehicle types to radio card options format
     const getVehicleTypeOptions = () => {
@@ -247,35 +252,22 @@ const BookingForm = () => {
             value: type.id.toString(),
             label: type.name,
             description: `${type.wheelCount}-wheel vehicle type`,
-            image: `https://via.placeholder.com/150?text=${type.name}`
+            image: type.wheelCount == 4 ? `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` : `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
         }));
-
-        // try {
-        //     const response = await fetch('http://localhost:3001/api/vehicles/types');
-        //     const data = await response.json();
-        //     console.log(data.data);
-        //     return  data.data.map(type => ({
-        //         value: type.id.toString(),
-        //         label: type.name,
-        //         description: `${type.wheelCount}-wheel vehicle type`,
-        //         image: `https://via.placeholder.com/150?text=${type.name}`
-        //     }));
-        // } catch (error) {
-        //     console.log(error)
-        // }
     };
 
     // Convert vehicle models to radio card options format
     const getVehicleModelOptions = () => {
+        console.log('Vehicle models:', vehicleModels);
         return vehicleModels.map(model => ({
             value: model.id.toString(),
             label: `${model.company} ${model.model}`,
             description: `Released: ${model.releasedIn} - Daily Cost: $${model.dailyCost}`,
-            image: `https://via.placeholder.com/150?text=${model.company}+${model.model}`
+            image: model.VehicleDatum.wheelCount == 4 ? `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` : `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
         }));
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         let canProceed = false;
 
         switch (activeStep) {
@@ -307,6 +299,14 @@ const BookingForm = () => {
             case 4:
                 // Date range step
                 if (formik.values.dateRange[0] && formik.values.dateRange[1] && !formik.errors.dateRange) {
+                    // Check vehicle availability before proceeding
+                    await checkVehicleAvailability();
+                    canProceed = true;
+                }
+                break;
+            case 5:
+                // Confirmation step - submit if vehicle is available
+                if (vehicleAvailable) {
                     formik.handleSubmit();
                     return;
                 }
@@ -418,6 +418,70 @@ const BookingForm = () => {
                     <CustomDateRangePicker formik={formik} />
                 );
 
+            case 5:
+                // Confirmation step with availability status
+                const selectedType = vehicleTypes.find(type => type.id === formik.values.vehicleTypeId);
+                console.log('Selected typedsds:', formik.values);
+                const selectedModel = vehicleModels.find(model => model.id === formik.values.vehicleModelId);
+                const startDate = formik.values.dateRange[0]?.toLocaleDateString();
+                const endDate = formik.values.dateRange[1]?.toLocaleDateString();
+
+                return (
+                    <Box component={motion.div}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <Typography variant="h6" gutterBottom>
+                            Booking Summary
+                        </Typography>
+
+                        <Box sx={{ mt: 2, mb: 3 }}>
+                            <Typography variant="body1">
+                                <strong>Name:</strong> {formik.values.firstName} {formik.values.lastName}
+                            </Typography>
+                            <Typography variant="body1">
+                                <strong>Vehicle Type:</strong> {selectedType?.name}
+                            </Typography>
+                            <Typography variant="body1">
+                                <strong>Vehicle Model:</strong> {selectedModel ? `${selectedModel.company} ${selectedModel.model}` : ''}
+                            </Typography>
+                            <Typography variant="body1">
+                                <strong>Daily Cost:</strong> ${selectedModel?.dailyCost}
+                            </Typography>
+                            <Typography variant="body1">
+                                <strong>Booking Period:</strong> {startDate} to {endDate}
+                            </Typography>
+                        </Box>
+
+                        {isCheckingAvailability ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                                <CircularProgress />
+                                <Typography variant="body1" sx={{ ml: 2 }}>
+                                    Checking availability...
+                                </Typography>
+                            </Box>
+                        ) : (
+                            vehicleAvailable !== null && (
+                                <Alert
+                                    severity={vehicleAvailable ? "success" : "error"}
+                                    sx={{ mt: 2, mb: 2 }}
+                                >
+                                    {vehicleAvailable
+                                        ? "Vehicle is available for the selected dates!"
+                                        : "Sorry, this vehicle is not available for the selected dates."}
+                                </Alert>
+                            )
+                        )}
+
+                        {!vehicleAvailable && vehicleAvailable !== null && (
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                                Please go back and modify your selection or choose different dates.
+                            </Typography>
+                        )}
+                    </Box>
+                );
+
             default:
                 return null;
         }
@@ -425,6 +489,7 @@ const BookingForm = () => {
 
     return (
         <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+            <ToastContainer position="top-right" autoClose={5000} />
             <Paper
                 elevation={3}
                 sx={{
@@ -452,27 +517,57 @@ const BookingForm = () => {
                         {activeStep > 0 && (
                             <Button
                                 variant="outlined"
-                                onClick={() => setActiveStep(prevStep => prevStep - 1)}
-                                disabled={isSubmitting}
+                                onClick={() => {
+                                    // If not available in confirmation step, go back to vehicle selection
+                                    if (activeStep === 5 && vehicleAvailable === false) {
+                                        setActiveStep(1); // Go back to wheels selection
+                                    } else {
+                                        setActiveStep(prevStep => prevStep - 1);
+                                    }
+                                }}
+                                disabled={isSubmitting || isCheckingAvailability}
                             >
-                                Back
+                                {activeStep === 5 && vehicleAvailable === false ? "Change Selection" : "Back"}
                             </Button>
                         )}
                         <Box sx={{ flex: '1 1 auto' }} />
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleNext}
-                            disabled={isSubmitting}
-                            sx={{
-                                minWidth: '120px',
-                                position: 'relative'
-                            }}
-                        >
-                            {isSubmitting ? (
-                                <CircularProgress size={24} sx={{ color: 'white' }} />
-                            ) : activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-                        </Button>
+
+                        {/* Next/Check/Submit Button */}
+                        {(activeStep < 5 || (activeStep === 5 && vehicleAvailable === true)) && (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleNext}
+                                disabled={isSubmitting || isCheckingAvailability}
+                                sx={{
+                                    minWidth: '120px',
+                                    position: 'relative'
+                                }}
+                            >
+                                {isSubmitting || isCheckingAvailability ? (
+                                    <CircularProgress size={24} sx={{ color: 'white' }} />
+                                ) : activeStep === 4 ? (
+                                    <div>Check Availability</div>
+                                ) : activeStep === 5 ? (
+                                    <div>Complete Booking</div>
+                                ) : (
+                                    'Next'
+                                )}
+                            </Button>
+                        )}
+
+                        {/* Re-check availability button */}
+                        {activeStep === 5 && vehicleAvailable !== true && !isCheckingAvailability && (
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={checkVehicleAvailability}
+                                disabled={isSubmitting}
+                                sx={{ ml: 2 }}
+                            >
+                                Re-check Availability
+                            </Button>
+                        )}
                     </Box>
                 </form>
             </Paper>

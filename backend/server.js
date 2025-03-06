@@ -1,10 +1,14 @@
 import express from 'express';
+import cors from 'cors';
 import sequelize from './src/utils/db.js';
 import vehicleRoutes from './src/routes/vehicleRoutes.js';
 import bookingRoutes from './src/routes/bookingRoutes.js';
 
-const app = express();
+cors({ origin: true, credentials: true });
 
+
+const app = express();
+app.use(cors());
 app.use(express.json());
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/bookings', bookingRoutes);
