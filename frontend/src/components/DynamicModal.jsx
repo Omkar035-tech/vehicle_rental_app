@@ -11,6 +11,7 @@ const DynamicModal = ({ isOpen, onClose, onSubmit, title, fields }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onSubmit(formData);
+        setFormData({});
         onClose();
     };
 

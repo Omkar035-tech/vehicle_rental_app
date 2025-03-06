@@ -12,7 +12,8 @@ import {
     Step,
     StepLabel,
     CircularProgress,
-    Alert
+    Alert,
+    Modal
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import CustomRadioCardGroup from './RadioCard';
@@ -305,7 +306,7 @@ const BookingForm = () => {
             value: type.id.toString(),
             label: type.name,
             description: `${type.wheelCount}-wheel vehicle type`,
-            image: type.wheelCount == 4 ? `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` : `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
+            image: type.placeImg != "" && type.placeImg != undefined ? type.placeImg : type.wheelCount == 4 ? `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` : `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
         }));
     };
 
@@ -315,7 +316,7 @@ const BookingForm = () => {
             value: model.id.toString(),
             label: `${model.company} ${model.model}`,
             description: `Released: ${model.releasedIn} - Daily Cost: $${model.dailyCost}`,
-            image: model.VehicleDatum.wheelCount == 4 ? `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` : `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
+            image: model.placeImg != "" && model.placeImg != undefined ? model.placeImg : model.VehicleDatum.wheelCount == 4 ? `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` : `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
         }));
     };
 
@@ -563,13 +564,16 @@ const BookingForm = () => {
                     Vehicle Booking
                 </Typography>
 
-                <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
-                    {steps.map((label) => (
-                        <Step key={label}>
-                            <StepLabel>{label}</StepLabel>
-                        </Step>
-                    ))}
-                </Stepper>
+                <div className=''>
+
+                    <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
+                        {steps.map((label) => (
+                            <Step key={label}>
+                                <StepLabel>{label}</StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                </div>
 
                 <form onSubmit={formik.handleSubmit}>
                     {renderStepContent()}

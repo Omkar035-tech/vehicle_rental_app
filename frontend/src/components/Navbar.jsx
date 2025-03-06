@@ -36,7 +36,9 @@ const Navbar = () => {
             model: formData.model,
             company: formData.company,
             releasedIn: formData.releasedIn,
-            dailyCost: formData.dailyCost
+            dailyCost: formData.dailyCost,
+            VehicleImg: formData.vehicleImage,
+            placeImg: formData.vehiclePlaceholder,
         }
 
         const response = await fetch("http://localhost:3001/api/vehicles/create", {
@@ -47,7 +49,9 @@ const Navbar = () => {
             body: JSON.stringify(DataToPost)
         });
         const data = await response.json();
-        console.log(data)
+        if (data.status) {
+
+        }
     };
 
     console.log('isModalOpen:', isModalOpen); // Debugging

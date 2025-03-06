@@ -23,6 +23,10 @@ export default {
             updatedAt: {
                 type: Sequelize.DATE,
                 allowNull: false
+            },
+            placeImg: {
+                type: Sequelize.STRING,
+                allowNull: false,
             }
         });
     },

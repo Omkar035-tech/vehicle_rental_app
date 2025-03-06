@@ -22,6 +22,10 @@ const VehicleInfo = (sequelize) => {
         dailyCost: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false
+        },
+        VehicleImg: {
+            type: DataTypes.STRING,
+            allowNull: false
         }
     }, {
         tableName: 'vehicle_info'
