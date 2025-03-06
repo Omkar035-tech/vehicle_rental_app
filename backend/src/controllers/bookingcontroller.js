@@ -1,14 +1,87 @@
 import { Booking, VehicleInfo } from '../models/index.js';
 import { Op } from 'sequelize';
 
+// export const checkAvailability = async (req, res) => {
+//     try {
+//         const { vehicleId, startDate, endDate } = req.query;
+//         console.log(vehicleId, startDate, endDate)
+//         if (!vehicleId || !startDate || !endDate) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'Vehicle ID, start date and end date are required'
+//             });
+//         }
+
+//         // Convert to Date objects
+//         const start = new Date(startDate);
+//         const end = new Date(endDate);
+
+//         // Validate date range
+//         if (start >= end) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'End date must be after start date'
+//             });
+//         }
+
+//         // Check if the vehicle exists
+//         const vehicle = await VehicleInfo.findByPk(vehicleId);
+//         console.log(vehicle)
+//         if (!vehicle) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: 'Vehicle not found'
+//             });
+//         }
+
+//         // Check for overlapping bookings
+//         const overlappingBookings = await Booking.findAll({
+//             where: {
+//                 vehicleId,
+//                 status: 'CONFIRMED', // Only check confirmed bookings
+//                 [Op.or]: [
+//                     {
+//                         startDate: {
+//                             [Op.lte]: end
+//                         },
+//                         endDate: {
+//                             [Op.gte]: start
+//                         }
+//                     }
+//                 ]
+//             }
+//         });
+
+//         const isAvailable = overlappingBookings.length === 0;
+
+//         return res.status(200).json({
+//             success: true,
+//             data: {
+//                 vehicle,
+//                 isAvailable,
+//                 overlappingBookings: isAvailable ? [] : overlappingBookings
+//             }
+//         });
+//     } catch (error) {
+//         console.error('Error checking availability:', error);
+//         return res.status(500).json({
+//             success: false,
+//             message: 'Failed to check availability',
+//             error: error.message
+//         });
+//     }
+// };
+
+//Create a new booking
+
 export const checkAvailability = async (req, res) => {
     try {
         const { vehicleId, startDate, endDate } = req.query;
-        console.log(vehicleId, startDate, endDate)
+        console.log(vehicleId, startDate, endDate);
         if (!vehicleId || !startDate || !endDate) {
             return res.status(400).json({
                 success: false,
-                message: 'Vehicle ID, start date and end date are required'
+                message: 'Vehicle ID, start date, and end date are required'
             });
         }
 
@@ -40,7 +113,6 @@ export const checkAvailability = async (req, res) => {
                 status: 'CONFIRMED', // Only check confirmed bookings
                 [Op.or]: [
                     {
-                        // Start date falls within existing booking
                         startDate: {
                             [Op.lte]: end
                         },
@@ -54,12 +126,24 @@ export const checkAvailability = async (req, res) => {
 
         const isAvailable = overlappingBookings.length === 0;
 
+        // Calculate total price
+        const durationMs = end.getTime() - start.getTime();
+        const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
+        const totalPrice = durationDays * parseFloat(vehicle.dailyCost);
+
+        // Prepare the response with required fields
+        const responseData = {
+            model: vehicle.model,
+            company: vehicle.company,
+            releasedIn: vehicle.releasedIn,
+            totalPrice: totalPrice.toFixed(2), // Format to 2 decimal places
+            isAvailable,
+            overlappingBookings: isAvailable ? [] : overlappingBookings
+        };
+
         return res.status(200).json({
             success: true,
-            data: {
-                isAvailable,
-                overlappingBookings: isAvailable ? [] : overlappingBookings
-            }
+            data: responseData
         });
     } catch (error) {
         console.error('Error checking availability:', error);
@@ -70,8 +154,6 @@ export const checkAvailability = async (req, res) => {
         });
     }
 };
-
-//Create a new booking
 
 export const createBooking = async (req, res) => {
     try {
@@ -177,7 +259,7 @@ export const createBooking = async (req, res) => {
 export const getAllBookings = async (req, res) => {
     try {
         const bookings = await Booking.findAll({
-            include: [{ model: Vehicle }]
+            include: [{ model: VehicleInfo }]
         });
 
         return res.status(200).json({
