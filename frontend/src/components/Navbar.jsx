@@ -9,8 +9,17 @@ const Navbar = () => {
 
     const vehicleFields = [
         { name: 'name', label: 'Name', type: 'text', required: true },
-        { name: 'wheelCount', label: 'Wheel Count', type: 'number', required: true },
-        { name: 'vehiclePlaceholder', label: 'Vehicle Placeholder', type: 'text' },
+        {
+            name: "wheelCount",
+            label: "Wheel Count",
+            fieldType: "select",
+            options: [
+                { value: 2, label: "2 wheeler" },
+                { value: 4, label: "4 wheeler" }
+            ],
+            required: true,
+        },
+        { name: 'vehiclePlaceholder', label: 'Vehicle Placeholder Image', type: 'text' },
         { name: 'model', label: 'Model', type: 'text', required: true },
         { name: 'company', label: 'Company', type: 'text', required: true },
         { name: 'releasedIn', label: 'Released In', type: 'number', required: true },
@@ -18,9 +27,27 @@ const Navbar = () => {
         { name: 'vehicleImage', label: 'Vehicle Image URL', type: 'text', required: true },
     ];
 
-    const handleSubmit = (formData) => {
+    const handleSubmit = async (formData) => {
         console.log('Form Data Submitted:', formData);
-        // Handle form submission (e.g., send data to an API)
+
+        const DataToPost = {
+            name: formData.name,
+            wheelCount: formData.wheelCount,
+            model: formData.model,
+            company: formData.company,
+            releasedIn: formData.releasedIn,
+            dailyCost: formData.dailyCost
+        }
+
+        const response = await fetch("http://localhost:3001/api/vehicles/create", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(DataToPost)
+        });
+        const data = await response.json();
+        console.log(data)
     };
 
     console.log('isModalOpen:', isModalOpen); // Debugging

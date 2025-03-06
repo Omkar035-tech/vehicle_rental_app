@@ -27,15 +27,32 @@ const DynamicModal = ({ isOpen, onClose, onSubmit, title, fields }) => {
                                 <label className="block text-sm font-medium text-gray-700">
                                     {field.label}
                                 </label>
-                                <input
-                                    type={field.type || "text"}
-                                    name={field.name}
-                                    value={formData[field.name] || ""}
-                                    onChange={handleChange}
-                                    placeholder={field.placeholder || ""}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required={field.required || false}
-                                />
+                                {field.fieldType === "select" ? (
+                                    <select
+                                        name={field.name}
+                                        value={formData[field.name] || ""}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required={field.required || false}
+                                    >
+                                        <option value="">Select an option</option>
+                                        {field.options.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <input
+                                        type={field.type || "text"}
+                                        name={field.name}
+                                        value={formData[field.name] || ""}
+                                        onChange={handleChange}
+                                        placeholder={field.placeholder || ""}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required={field.required || false}
+                                    />
+                                )}
                             </div>
                         ))}
                     </div>
