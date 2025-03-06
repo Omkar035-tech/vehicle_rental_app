@@ -1,5 +1,5 @@
 import express from 'express';
-import { getVehicleInfoById, getVehicleTypeById, getVehicleTypes, getVehiclesInfoByType } from '../controllers/vehicleController.js';
+import { getVehicleInfoById, getVehicleTypeById, getVehicleTypes, getVehiclesInfoByType, createVehicle } from '../controllers/vehicleController.js';
 
 const router = express.Router();
 
@@ -31,5 +31,12 @@ router.get('/byType/:typeId', getVehiclesInfoByType);
  * @access  Public
  */
 router.get('/:id', getVehicleInfoById);
+
+/**
+ * @route   POST /api/vehicles/create
+ * @desc    Create vehicledata and vehicleinfo
+ * @access  Public
+ */
+router.post('/create', createVehicle);
 
 export default router;

@@ -116,3 +116,39 @@ export const getVehicleInfoById = async (req, res) => {
         });
     }
 };
+
+//addon for creating vehicle data
+
+export const createVehicle = async (req, res) => {
+    try {
+        const { name, wheelCount, model, company, releasedIn, dailyCost } = req.body;
+        console.log(req.body)
+
+        const vehicleData = await VehicleData.create({
+            name,
+            wheelCount
+        });
+
+        const vehicleInfo = await VehicleInfo.create({
+            model,
+            company,
+            releasedIn,
+            dailyCost,
+            vehicleDataId: vehicleData.id
+        });
+
+        res.status(201).json({
+            message: 'Vehicle created successfully',
+            vehicle: {
+                ...vehicleInfo.toJSON(),
+                vehicleData: vehicleData.toJSON()
+            }
+        });
+    } catch (error) {
+        console.error('Error creating vehicle:', error);
+        res.status(500).json({
+            message: 'Error creating vehicle',
+            error: error.message
+        });
+    }
+};
