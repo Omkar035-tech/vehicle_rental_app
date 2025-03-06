@@ -13,11 +13,14 @@
   "license": "ISC",
   "author": "Omkar Apandkar",
   "type": "module",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "nodemon app.js",
     "migrate": "sequelize-cli db:migrate",
-    "seed": "sequelize-cli db:seed:all"
+    "migrate:undo": "sequelize-cli db:migrate:undo",
+    "seed": "sequelize-cli db:seed:all",
+    "seed:undo": "sequelize-cli db:seed:undo",
+    "db:reset": "sequelize db:migrate:undo:all && sequelize db:migrate"
   },
   "dependencies": {
     "cors": "^2.8.5",
