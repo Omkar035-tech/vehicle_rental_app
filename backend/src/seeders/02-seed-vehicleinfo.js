@@ -1,6 +1,6 @@
 export default {
     up: async (queryInterface) => {
-        await queryInterface.bulkInsert('vehicleInfo', [
+        await queryInterface.bulkInsert('vehicle_info', [
             {
                 id: 1,
                 model: "Civic",
@@ -20,6 +20,6 @@ export default {
         ]);
     },
     down: async (queryInterface) => {
-        await queryInterface.bulkDelete('vehicleInfo', null, {});
+        await queryInterface.bulkDelete('vehicle_info', null, {});
     }
 };

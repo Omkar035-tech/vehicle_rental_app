@@ -1,6 +1,6 @@
 export default {
     up: async (queryInterface) => {
-        await queryInterface.bulkInsert('vehicleData', [
+        await queryInterface.bulkInsert('vehicle_data', [
             {
                 name: 'Hatchback',
                 wheelCount: 4,
@@ -28,6 +28,6 @@ export default {
         ]);
     },
     down: async (queryInterface) => {
-        await queryInterface.bulkDelete('vehicleData', null, {});
+        await queryInterface.bulkDelete('vehicle_data', null, {});
     }
 };
