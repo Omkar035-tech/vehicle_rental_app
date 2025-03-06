@@ -7,7 +7,9 @@ export default {
                 company: "Honda",
                 releasedIn: 2022,
                 dailyCost: 500.00,
-                vehicleDataId: 1
+                vehicleDataId: 1,
+                createdAt: new Date(),
+                updatedAt: new Date()
             },
             {
                 id: 2,
@@ -15,7 +17,9 @@ export default {
                 company: "Royal Enfield",
                 releasedIn: 2021,
                 dailyCost: 400.00,
-                vehicleDataId: 4
+                vehicleDataId: 4,
+                createdAt: new Date(),
+                updatedAt: new Date()
             }
         ]);
     },

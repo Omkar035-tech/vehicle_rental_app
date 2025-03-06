@@ -7,9 +7,9 @@ const app = express();
 app.use(express.json());
 app.use('/api/vehicles', vehicleRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
-sequelize.sync({ alter: true });
+sequelize.sync({ force: true });
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

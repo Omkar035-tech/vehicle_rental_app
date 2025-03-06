@@ -9,7 +9,9 @@ export default {
                 customerLastName: "Doe",
                 totalPrice: 250.00,
                 status: "CONFIRMED",
-                vehicleId: 1
+                vehicleId: 1,
+                createdAt: new Date(),
+                updatedAt: new Date()
             }
         ]);
     },

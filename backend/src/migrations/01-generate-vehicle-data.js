@@ -13,7 +13,7 @@ export default {
                 allowNull: false
             },
             wheelCount: {
-                type: Sequelize.STRING,
+                type: Sequelize.INTEGER,
                 allowNull: false
             },
             createdAt: {

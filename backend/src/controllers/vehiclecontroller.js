@@ -5,9 +5,9 @@ import { VehicleData, VehicleInfo } from "../models/index.js"
 export const getVehicleTypes = async (req, res) => {
     try {
         const { wheelCount } = req.query;
-
+        console.log(wheelCount)
         const vehicleTypes = await VehicleData.findAll({
-            where: wheelCount ? { wheelCount: parseInt(wheelCount) } : {},
+            where: wheelCount ? { wheelCount: wheelCount } : {},
             attributes: ['id', 'name', 'wheelCount']
         });
 
