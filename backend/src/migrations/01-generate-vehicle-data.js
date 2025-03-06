@@ -1,9 +1,8 @@
 export default {
     up: async (queryInterface, Sequelize) => {
-        await queryInterface.createTable('vehicleData', {
+        await queryInterface.createTable('vehicle_data', {
             id: {
-                type: Sequelize.UUID,
-                defaultValue: Sequelize.UUIDV4,
+                type: Sequelize.INTEGER,
                 primaryKey: true,
                 allowNull: false,
                 autoIncrement: true,
@@ -28,6 +27,6 @@ export default {
         });
     },
     down: async (queryInterface) => {
-        await queryInterface.dropTable('vehicleData');
+        await queryInterface.dropTable('vehicle_data');
     }
 };

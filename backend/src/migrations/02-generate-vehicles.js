@@ -1,6 +1,6 @@
 export default {
     up: async (queryInterface, Sequelize) => {
-        await queryInterface.createTable('vehicleInfo', {
+        await queryInterface.createTable('vehicle_info', {
             id: {
                 type: Sequelize.INTEGER,
                 primaryKey: true,
@@ -27,7 +27,7 @@ export default {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
-                    model: 'vehicleData',
+                    model: 'vehicle_data',
                     key: 'id'
                 },
                 onUpdate: 'CASCADE',
@@ -42,10 +42,9 @@ export default {
                 type: Sequelize.DATE
             }
         });
-        await queryInterface.addIndex('vehicleInfo', ['vehicleDataId']);
+        await queryInterface.addIndex('vehicle_info', ['vehicleDataId']);
     },
     down: async (queryInterface) => {
-        await queryInterface.dropTable('vehicleInfo');
+        await queryInterface.dropTable('vehicle_info');
     }
 };
-
