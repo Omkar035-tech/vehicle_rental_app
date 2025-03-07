@@ -1,13 +1,14 @@
+
 import { NavLink, useLocation } from 'react-router-dom';
 import { CirclePlus } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DynamicModal from './DynamicModal';
 
 const Navbar = () => {
     const location = useLocation();
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const vehicleFields = [
+    const [vehicleTypes, setVehicleTypes] = useState([]);
+    const [vehicleFields, setVehicleFields] = useState([
         { name: 'name', label: 'Name', type: 'text', required: true },
         {
             name: "wheelCount",
@@ -25,7 +26,49 @@ const Navbar = () => {
         { name: 'releasedIn', label: 'Released In', type: 'number', required: true },
         { name: 'dailyCost', label: 'Daily Cost', type: 'text', required: true },
         { name: 'vehicleImage', label: 'Vehicle Image URL', type: 'text', required: true },
-    ];
+    ]);
+
+    const fetchVehicleTypes = async () => {
+        try {
+            const response = await fetch("http://localhost:3001/api/vehicles/types");
+            const data = await response.json();
+
+            if (data.data && Array.isArray(data.data)) {
+                setVehicleTypes(data.data);
+
+                // Update the name and vehiclePlaceholder fields to use the fetched data
+                setVehicleFields(prevFields => {
+                    return prevFields.map(field => {
+                        if (field.name === 'name') {
+                            return {
+                                ...field,
+                                fieldType: "select",
+                                options: data.data.map(type => ({
+                                    value: type.name,
+                                    label: type.name
+                                }))
+                            };
+                        } else if (field.name === 'vehiclePlaceholder') {
+                            return {
+                                ...field,
+                                fieldType: "select",
+                                options: data.data.map(type => ({
+                                    value: type.placeholderImage,
+                                    label: `${type.name} Placeholder`
+                                }))
+                            };
+                        }
+                        return field;
+                    });
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching vehicle types:", error);
+        }
+    };
+    useEffect(() => {
+        fetchVehicleTypes();
+    }, []);
 
     const handleSubmit = async (formData) => {
         const DataToPost = {
@@ -35,7 +78,7 @@ const Navbar = () => {
             company: formData.company,
             releasedIn: formData.releasedIn,
             dailyCost: formData.dailyCost,
-            VehicleImg: formData.vehicleImage,
+            vehicleImg: formData.vehicleImage,
             placeImg: formData.vehiclePlaceholder,
         }
 
@@ -48,10 +91,10 @@ const Navbar = () => {
         });
         const data = await response.json();
         if (data.status) {
-
+            // Handle successful submission
+            setIsModalOpen(false);
         }
     };
-
 
     return (
         <div>
@@ -81,7 +124,7 @@ const Navbar = () => {
                 <div>
                     <button
                         onClick={() => {
-                            console.log('Button clicked'); // Debugging
+                            fetchVehicleTypes();
                             setIsModalOpen(true);
                         }}
                         className="bg-black flex justify-center items-center text-white hover:bg-gray-800 rounded-xl outline-0 font-semibold px-4 py-3"

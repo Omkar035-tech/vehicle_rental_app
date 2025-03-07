@@ -152,7 +152,6 @@ export const createBooking = async (req, res) => {
         const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
 
         const totalPrice = durationDays * parseFloat(vehicle.dailyCost);
-        console.log(durationMs, durationDays, totalPrice, vehicle)
         const booking = await Booking.create({
             vehicleId,
             startDate: start,
