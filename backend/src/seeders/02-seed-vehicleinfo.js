@@ -2,7 +2,6 @@ export default {
     up: async (queryInterface) => {
         await queryInterface.bulkInsert('vehicle_info', [
             {
-                id: 1,
                 model: "Slx",
                 company: "Volkswagon",
                 releasedIn: 2022,
@@ -13,7 +12,6 @@ export default {
                 updatedAt: new Date()
             },
             {
-                id: 2,
                 model: "Swift",
                 company: "Suzuli",
                 releasedIn: 2022,
@@ -24,7 +22,6 @@ export default {
                 updatedAt: new Date()
             },
             {
-                id: 3,
                 model: "Bullet 350",
                 company: "Royal Enfield",
                 releasedIn: 2021,
@@ -35,7 +32,6 @@ export default {
                 updatedAt: new Date()
             },
             {
-                id: 4,
                 model: "Model S",
                 company: "Tesla",
                 releasedIn: 2020,
@@ -46,7 +42,6 @@ export default {
                 updatedAt: new Date()
             },
             {
-                id: 5,
                 model: "Activa",
                 company: "Honda",
                 releasedIn: 2019,
@@ -57,7 +52,6 @@ export default {
                 updatedAt: new Date()
             },
             {
-                id: 6,
                 model: "Desire",
                 company: "Hundei",
                 releasedIn: 2019,
