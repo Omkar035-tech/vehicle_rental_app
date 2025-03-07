@@ -41,7 +41,7 @@ export default {
                 allowNull: false,
                 type: Sequelize.DATE
             },
-            VehicleImg: {
+            vehicleImg: {
                 type: Sequelize.STRING,
                 allowNull: false
             }

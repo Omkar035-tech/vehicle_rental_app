@@ -1,3 +1,4 @@
+//local config setup
 // require('dotenv').config();
 
 // module.exports = {
@@ -25,6 +26,7 @@
 // };
 
 
+//for NeonDB with SSL proff
 require('dotenv').config();
 
 module.exports = {

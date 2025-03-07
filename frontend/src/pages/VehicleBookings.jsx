@@ -130,7 +130,7 @@ const VehicleBookings = () => {
                                 >
                                     <div className="md:w-1/6 flex justify-center">
                                         <img
-                                            src={booking.VehicleInfo.VehicleImg ? booking.VehicleInfo.VehicleImg : "https://i.ibb.co/KcgZtDrh/pngwing-com.png"}
+                                            src={booking.VehicleInfo.vehicleImg ? booking.VehicleInfo.vehicleImg : "https://i.ibb.co/KcgZtDrh/pngwing-com.png"}
                                             alt={`${booking.VehicleInfo.company} ${booking.VehicleInfo.model}`}
                                             className="h-20 object-contain"
                                         />

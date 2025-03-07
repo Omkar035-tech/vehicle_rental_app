@@ -273,7 +273,7 @@ const BookingForm = () => {
             value: model.id.toString(),
             label: `${model.company} ${model.model}`,
             description: `Released: ${model.releasedIn} - Daily Cost: $${model.dailyCost}`,
-            image: model.VehicleImg && model.VehicleImg !== "" ? model.VehicleImg :
+            image: model.vehicleImg && model.vehicleImg !== "" ? model.vehicleImg :
                 model.VehicleDatum && model.VehicleDatum.wheelCount == 4 ?
                     `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` :
                     `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,

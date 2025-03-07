@@ -5,7 +5,6 @@ import { VehicleData, VehicleInfo } from "../models/index.js"
 export const getVehicleTypes = async (req, res) => {
     try {
         const { wheelCount } = req.query;
-        console.log(wheelCount)
         const vehicleTypes = await VehicleData.findAll({
             where: wheelCount ? { wheelCount: wheelCount } : {},
             attributes: ['id', 'name', 'wheelCount', 'placeImg']
@@ -119,23 +118,27 @@ export const getVehicleInfoById = async (req, res) => {
 
 //addon for creating vehicle data
 
+
 export const createVehicle = async (req, res) => {
     try {
-        const { name, wheelCount, model, company, releasedIn, dailyCost, placeImg, VehicleImg } = req.body;
-        console.log(req.body)
+        const { name, wheelCount, model, company, releasedIn, dailyCost, placeImg, vehicleImg } = req.body;
 
-        const vehicleData = await VehicleData.create({
-            name,
-            wheelCount,
-            placeImg
-        });
+        let vehicleData = await VehicleData.findOne({ where: { name } });
+
+        if (!vehicleData) {
+            vehicleData = await VehicleData.create({
+                name,
+                wheelCount,
+                placeImg
+            });
+        }
 
         const vehicleInfo = await VehicleInfo.create({
             model,
             company,
             releasedIn,
             dailyCost,
-            VehicleImg,
+            vehicleImg,
             vehicleDataId: vehicleData.id
         });
 

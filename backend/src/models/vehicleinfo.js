@@ -23,7 +23,7 @@ const VehicleInfo = (sequelize) => {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false
         },
-        VehicleImg: {
+        vehicleImg: {
             type: DataTypes.STRING,
             allowNull: false
         }
