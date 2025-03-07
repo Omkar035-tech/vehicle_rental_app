@@ -1,5 +1,5 @@
 import express from 'express';
-import { getVehicleInfoById, getVehicleTypeById, getVehicleTypes, getVehiclesInfoByType, createVehicle } from '../controllers/vehicleController.js';
+import { getVehicleInfoById, getVehicleTypeById, getVehicleTypes, getVehiclesInfoByType, createVehicle } from '../controllers/vehiclecontroller.js';
 
 const router = express.Router();
 
