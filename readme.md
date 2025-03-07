@@ -1,57 +1,83 @@
-# Vehicle Rental Booking System
+# Vehicle Rental System 🚗🏍️
 
-## Project Overview
+Welcome to the Vehicle Rental System! This project allows users to book vehicles, including cars and bikes, with an intuitive frontend form-based interface. It incorporates backend validation, dynamic vehicle selection, and seamless booking features. Below is a breakdown of the project structure, technologies used, and features implemented.
 
-A full-stack web application for seamless vehicle rental bookings, allowing users to easily select and reserve vehicles through an intuitive, step-by-step form interface.
+---
 
-### Key Features
-- Multi-step booking process with single-question-per-screen approach
-- Support for both 2-wheeler and 4-wheeler vehicle rentals
-- Dynamic vehicle type and model selection
-- Date range booking with availability checking
-- Responsive design for mobile and desktop
+## 📋 Features
 
-## Technology Stack
+### Backend Features
+- **User Input Validation**: Ensures correct input and data types for each request.
+- **Vehicle Booking System**:
+  - Prevents booking overlap (ensures only one vehicle of each type can be booked at a time).
+  - Receives and processes booking requests.
+- **Database Management**:
+  - Utilizes an SQL-based database.
+  - Uses ORM (Object-Relational Mapping) for data handling and interaction.
+  - Seeds the database with initial data (vehicle types, vehicles).
+  
+### Frontend Features
+- **Form-Based Interface**: 
+  - Users are guided through a series of steps, answering one question per screen.
+  - Each step ensures that the user can proceed only after providing the correct input (validated and error handling).
+  
+- **Dynamic Vehicle Selection**:
+  - Based on user choices, only relevant vehicles will be displayed (e.g., choosing 2 wheels will filter the vehicle options accordingly).
+  
+- **Responsive UI**: 
+  - Built using **React**, **Material UI** for theming, and **Tailwind CSS** for utility classes.
+  
+---
+
+## 🛠️ Tech Stack
 
 ### Backend
-- **Language**: Node.js
-- **Framework**: Express.js
-- **Database**: PostgreSQL
-- **ORM**: Sequelize
+- **Node.js** with a chosen framework (Express.js)
+- **SQL Database** (PostgreSQL)
+- **ORM** (Sequelize)
 
 ### Frontend
-- **Framework**: React
-- **Styling**: Material UI
-- **CSS**: Tailwind CSS (v4)
-- **State Management**: Redux Toolkit
+- **React.js**
+- **Material UI** (for UI components and theming)
+- **Tailwind CSS** (for utility-first styling)
 
-## Prerequisites
-- Node.js (v14 or later)
-- npm or yarn
-- Post installed
+---
 
-## Installation
+## 🏁 Getting Started
 
-### Backend Setup
-```bash
-# Clone the repository
-git clone https://github.com/Omkar035-tech/vehicle_rental_app.git
+### Prerequisites
+1. **Node.js** installed on your machine.
+2. **npm** (or **yarn**) to install dependencies.
+3. **SQL Database** setup ( PostgreSQL).
 
-# Navigate to backend directory
-cd vehicle_rental_app/backend
+### Setup Backend
 
-# Install dependencies
-npm install
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Omkar035-tech/vehicle_rental_app.git
+   cd vehicle-rental-system
+   ```
 
-# Run database migrations
-npm run migrate
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-# Seed initial data
-npm run seed
+3. Setup the database:
+   - Update the **config** file with your database credentials.
+   - Run database migrations: [Note : Work only ENV-Development]
+     ```bash
+     npm run migrate
+     ```
+   - Seed initial data into the database:
+     ```bash
+     npm run seed
+     ```
 
-# Start the server
-npm start
-```
+4. Start the backend server:
+   ```bash
+   npm run dev
+   ```
 
 ### Frontend Setup
 ```bash
@@ -120,23 +146,117 @@ vehicle-rental-booking-system/
   - No overlapping bookings
   - Minimum/maximum rental periods
 
-## Future Enhancements
-- User authentication
-- Payment integration
-- More detailed vehicle information
-- Advanced filtering options
+---
 
-## Contributing
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## 🌱 Database Seed
 
-## License
-Auther retain all rights of code and others can freely use, modify, or distribute it without your explicit permission.
+The database is pre-seeded with initial values including:
+- **3 car types**: Hatchback, SUV, Sedan
+- **1 bike type**: Cruiser,Scooter
+- A few vehicles associated with each type (both cars and bikes).
 
-## Contact
-Omkar - omkarapandkar4u@gmail.com
+---
 
-Project Link: [https://github.com/Omkar035-tech/vehicle_rental_app.git](https://github.com/Omkar035-tech/vehicle_rental_app.git)
+## 📱 Frontend Form Flow
+
+1. **Name Input**: 
+   - User enters their first and last name.
+  
+2. **Number of Wheels**: 
+   - A radio button selection for either 2 or 4 wheels.
+  
+3. **Type of Vehicle**: 
+   - A radio button selection dynamically updated based on the number of wheels chosen (cars for 4 wheels, bikes for 2 wheels).
+  
+4. **Specific Vehicle Model**: 
+   - The user is presented with a list of vehicle models filtered by type (Car/Bike).
+  
+5. **Date Range Picker**: 
+   - Users can choose the start and end date for their booking.
+
+### Example Flow:
+- Select "2 wheels" → available options: **Cruiser, Scooter** bikes.
+- Select "4 wheels" → available options: **Hatchback, SUV, Sedan**.
+
+Once all questions are answered, the data is sent to the backend for booking validation and processing.
+
+---
+
+## 🏗️ Database Migrations
+
+To ensure the correct structure of your database, this project includes migrations for creating the necessary tables (for vehicles, types, and bookings). You can run the migrations by executing the following:
+
+```bash
+npm run migrate
+```
+
+---
+
+## 🧑‍💻 API Endpoints
+
+### 1. **GET /api/vehicles**  
+Retrieve available vehicles based on the user's selection of wheels and vehicle type.
+
+### 2. **POST /api/booking**  
+Submit the booking request. Ensures no overlapping bookings for the same vehicle.
+
+- **Payload**: 
+  ```json
+  {
+    "name": "John Doe",
+    "numberOfWheels": 4,
+    "vehicleType": "SUV",
+    "vehicleModel": "Toyota Highlander",
+    "startDate": "2025-03-10",
+    "endDate": "2025-03-15"
+  }
+  ```
+
+---
+
+## 🎈Finalize Work 
+
+**Live URL** - [https://vehicle-rental-app.vercel.app/]
+**API Endpoints** - [https://vehiclerentalapp-production.up.railway.app/api/vehicles/types] (Public Access)
+
+---
+
+## 📸 Project Screenshots
+
+Below are some screenshots of the Vehicle Rental System in action:
+
+### 1. **User Input Form**
+
+![User Input Form](https://i.ibb.co/xSQSgtLC/Screenshot-2025-03-07-191201.png)  
+![User Input Form](https://i.ibb.co/ZzcnQKHp/Screenshot-2025-03-07-191150.png)  
+_The user is asked for their name and the number of wheels for the vehicle._
+
+
+![Vehicle Data Input Form](https://i.ibb.co/NgnyRs2J/Screenshot-2025-03-07-191238.png)  
+_The user is asked for add new vehicle._
+
+
+![Page where all booking kept](https://i.ibb.co/9kZ86Hdn/Screenshot-2025-03-07-191257.png)  
+_All booking shown on booking page._
+
+---
+
+## 🚀 Contributing
+
+We welcome contributions to improve this project! If you'd like to contribute, please fork the repository, create a feature branch, and submit a pull request.
+
+---
+
+## 📄 License
+
+By permission of Author Code Can be used ,modified and shreard anyone
+
+---
+
+## 📧 Contact
+
+For any inquiries or issues, feel free to contact me at [omkarapandkar4u@gmail.com](mailto:omkarapandkar4u@gmail.com).
+
+---
+
+Happy coding! 🚗💨

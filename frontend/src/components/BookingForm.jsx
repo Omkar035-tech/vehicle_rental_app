@@ -107,7 +107,7 @@ const BookingForm = () => {
                     customerLastName: values.lastName
                 };
 
-                const response = await fetch("http://localhost:3001/api/bookings", {
+                const response = await fetch("https://vehiclerentalapp-production.up.railway.app/api/bookings", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ const BookingForm = () => {
                 vehicleId: vehicleId
             });
 
-            const response = await fetch(`http://localhost:3001/api/bookings/check-availability?${params.toString()}`, {
+            const response = await fetch(`https://vehiclerentalapp-production.up.railway.app/api/bookings/check-availability?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -205,7 +205,7 @@ const BookingForm = () => {
                     const params = new URLSearchParams({
                         wheelCount: wheelCount,
                     });
-                    const response = await fetch(`http://localhost:3001/api/vehicles/types?${params.toString()}`,
+                    const response = await fetch(`https://vehiclerentalapp-production.up.railway.app/api/vehicles/types?${params.toString()}`,
                         { method: 'GET', headers: { 'Content-Type': 'application/json' } }
                     );
                     const data = await response.json();
@@ -232,7 +232,7 @@ const BookingForm = () => {
             if (formik.values.vehicleTypeId) {
                 try {
                     const typeId = parseInt(formik.values.vehicleTypeId);
-                    const response = await fetch(`http://localhost:3001/api/vehicles/byType/${typeId}`,
+                    const response = await fetch(`https://vehiclerentalapp-production.up.railway.app/api/vehicles/byType/${typeId}`,
                         { method: 'GET', headers: { 'Content-Type': 'application/json' } }
                     );
                     const data = await response.json();
