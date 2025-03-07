@@ -28,8 +28,6 @@ const Navbar = () => {
     ];
 
     const handleSubmit = async (formData) => {
-        console.log('Form Data Submitted:', formData);
-
         const DataToPost = {
             name: formData.name,
             wheelCount: formData.wheelCount,
@@ -54,7 +52,6 @@ const Navbar = () => {
         }
     };
 
-    console.log('isModalOpen:', isModalOpen); // Debugging
 
     return (
         <div>
