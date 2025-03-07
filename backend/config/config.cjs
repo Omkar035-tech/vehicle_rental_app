@@ -36,8 +36,8 @@ module.exports = {
         database: process.env.DB_NAME,
         host: process.env.DB_HOST,
         dialect: 'postgres',
-        migrationsPath: "./src/migrations",
-        seedersPath: "./src/seeders",
+        migrationsPath: "../src/migrations",
+        seedersPath: "../src/seeders",
         dialectOptions: {
             ssl: {
                 require: true,
@@ -52,6 +52,8 @@ module.exports = {
         database: process.env.DB_TEST_NAME,
         host: process.env.DB_HOST,
         dialect: 'postgres',
+        migrationsPath: "../src/migrations",
+        seedersPath: "../src/seeders",
         dialectOptions: {
             ssl: {
                 require: true,
