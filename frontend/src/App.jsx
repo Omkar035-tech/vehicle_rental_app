@@ -28,11 +28,11 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import BookingForm from './components/BookingForm';
 import { BookingProvider } from './context/BookingContext';
-import About from './pages/About';
 import Contact from './pages/Contact';
 import Support from './pages/Support';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import VehicleBookings from './pages/VehicleBookings';
 
 const theme = createTheme({
   palette: {
@@ -57,7 +57,7 @@ function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<BookingForm />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/bookings" element={<VehicleBookings />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/support" element={<Support />} />
           </Routes>

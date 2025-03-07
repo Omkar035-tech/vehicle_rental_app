@@ -12,8 +12,7 @@ import {
     Step,
     StepLabel,
     CircularProgress,
-    Alert,
-    Modal
+    Alert
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import CustomRadioCardGroup from './RadioCard';
@@ -49,7 +48,6 @@ const steps = [
 ];
 
 const BookingForm = () => {
-    // Use the booking context
     const {
         activeStep,
         formValues,
@@ -68,7 +66,6 @@ const BookingForm = () => {
         resetForm
     } = useBookingContext();
 
-    // Form validation schema with Yup
     const validationSchema = Yup.object({
         firstName: Yup.string().required('First name is required'),
         lastName: Yup.string().required('Last name is required'),
@@ -96,34 +93,19 @@ const BookingForm = () => {
             .required('Booking dates are required')
     });
 
-    // Initialize formik with context values
     const formik = useFormik({
         initialValues: formValues,
         validationSchema,
         onSubmit: async (values) => {
             setIsSubmitting(true);
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                // Get vehicle type and model details for the final output
-                const selectedType = vehicleTypes.find(type => type.id === values.vehicleTypeId);
-                const selectedModel = vehicleModels.find(model => model.id === values.vehicleModelId);
-
-                const bookingDetails = {
-                    ...values,
-                    vehicleType: selectedType?.name || '',
-                    vehicleModel: selectedModel ? `${selectedModel.company} ${selectedModel.model}` : '',
-                    dailyCost: selectedModel?.dailyCost || '0.00'
-                };
-
                 const DataToPost = {
                     vehicleId: values.vehicleModelId,
                     startDate: values.dateRange[0].toISOString().split('T')[0],
                     endDate: values.dateRange[1].toISOString().split('T')[0],
                     customerFirstName: values.firstName,
                     customerLastName: values.lastName
-                }
+                };
 
                 const response = await fetch("http://localhost:3001/api/bookings", {
                     method: 'POST',
@@ -135,11 +117,19 @@ const BookingForm = () => {
                 const data = await response.json();
                 if (data.success) {
                     toast.success('Booking successful!');
-                    resetForm();
+                    localStorage.removeItem('bookingFormState');
                     formik.resetForm();
+                    resetForm();
+                    formik.setValues({
+                        firstName: '',
+                        lastName: '',
+                        wheels: '',
+                        vehicleTypeId: '',
+                        vehicleModelId: '',
+                        dateRange: [null, null]
+                    });
                 } else {
                     toast.error('Sorry, this vehicle is not available for the selected dates.');
-                    // resetForm();
                 }
                 setIsSubmitting(false);
             } catch (error) {
@@ -147,7 +137,8 @@ const BookingForm = () => {
                 toast.error('Error submitting booking. Please try again.');
                 setIsSubmitting(false);
             }
-        }
+        },
+        enableReinitialize: true // This ensures formik updates when formValues change
     });
 
     // Update context whenever formik values change
@@ -185,8 +176,6 @@ const BookingForm = () => {
                 }
             });
             const data = await response.json();
-            console.log('Data:', data);
-            await new Promise(resolve => setTimeout(resolve, 1500));
             const isAvailable = data.data.isAvailable;
             setVehicleAvailable(isAvailable);
 
@@ -212,7 +201,6 @@ const BookingForm = () => {
         const fetchVehicleTypes = async () => {
             if (formik.values.wheels) {
                 try {
-                    // For demo purposes, create some sample vehicle types based on wheel count
                     const wheelCount = parseInt(formik.values.wheels);
                     const params = new URLSearchParams({
                         wheelCount: wheelCount,
@@ -221,14 +209,17 @@ const BookingForm = () => {
                         { method: 'GET', headers: { 'Content-Type': 'application/json' } }
                     );
                     const data = await response.json();
-                    const filteredTypes = data.data.filter(type => type.wheelCount == wheelCount);
-                    setVehicleTypes(filteredTypes);
+                    if (data.data && Array.isArray(data.data)) {
+                        const filteredTypes = data.data.filter(type => type.wheelCount == wheelCount);
+                        setVehicleTypes(filteredTypes);
+                    }
 
                     // Reset vehicle type and model when wheels change
-                    formik.setFieldValue('vehicleTypeId', '');
-                    formik.setFieldValue('vehicleModelId', '');
+                    // formik.setFieldValue('vehicleTypeId', '');
+                    // formik.setFieldValue('vehicleModelId', '');
                 } catch (error) {
-                    console.log(error);
+                    console.error("Error fetching vehicle types:", error);
+                    toast.error("Error loading vehicle types. Please try again.");
                 }
             }
         };
@@ -240,83 +231,52 @@ const BookingForm = () => {
         const fetchVehicleModels = async () => {
             if (formik.values.vehicleTypeId) {
                 try {
-                    // For demo purposes, create some sample vehicle models based on type
                     const typeId = parseInt(formik.values.vehicleTypeId);
-                    // let models = [];
-
-                    // switch (typeId) {
-                    //     case 1: // Motorcycle
-                    //         models = [
-                    //             { id: 101, company: 'Honda', model: 'CBR', releasedIn: 2022, dailyCost: '45.00', vehicleDataId: 1, VehicleDatum: { wheelCount: 2 } },
-                    //             { id: 102, company: 'Yamaha', model: 'R1', releasedIn: 2023, dailyCost: '50.00', vehicleDataId: 1, VehicleDatum: { wheelCount: 2 } }
-                    //         ];
-                    //         break;
-                    //     case 2: // Scooter
-                    //         models = [
-                    //             { id: 201, company: 'Vespa', model: 'Primavera', releasedIn: 2022, dailyCost: '30.00', vehicleDataId: 2, VehicleDatum: { wheelCount: 2 } },
-                    //             { id: 202, company: 'Honda', model: 'Activa', releasedIn: 2023, dailyCost: '25.00', vehicleDataId: 2, VehicleDatum: { wheelCount: 2 } }
-                    //         ];
-                    //         break;
-                    //     case 3: // Sedan
-                    //         models = [
-                    //             { id: 301, company: 'Toyota', model: 'Camry', releasedIn: 2022, dailyCost: '75.00', vehicleDataId: 3, VehicleDatum: { wheelCount: 4 } },
-                    //             { id: 302, company: 'Honda', model: 'Accord', releasedIn: 2023, dailyCost: '70.00', vehicleDataId: 3, VehicleDatum: { wheelCount: 4 } }
-                    //         ];
-                    //         break;
-                    //     case 4: // SUV
-                    //         models = [
-                    //             { id: 401, company: 'Toyota', model: 'RAV4', releasedIn: 2022, dailyCost: '85.00', vehicleDataId: 4, VehicleDatum: { wheelCount: 4 } },
-                    //             { id: 402, company: 'Honda', model: 'CR-V', releasedIn: 2023, dailyCost: '80.00', vehicleDataId: 4, VehicleDatum: { wheelCount: 4 } }
-                    //         ];
-                    //         break;
-                    //     case 5: // Truck
-                    //         models = [
-                    //             { id: 501, company: 'Ford', model: 'F-150', releasedIn: 2022, dailyCost: '95.00', vehicleDataId: 5, VehicleDatum: { wheelCount: 4 } },
-                    //             { id: 502, company: 'Chevrolet', model: 'Silverado', releasedIn: 2023, dailyCost: '90.00', vehicleDataId: 5, VehicleDatum: { wheelCount: 4 } }
-                    //         ];
-                    //         break;
-                    // }
-
                     const response = await fetch(`http://localhost:3001/api/vehicles/byType/${typeId}`,
                         { method: 'GET', headers: { 'Content-Type': 'application/json' } }
                     );
                     const data = await response.json();
-                    const filteredModels = data.data.filter(model => model.vehicleDataId == typeId);
-                    console.log('Filtered models:', filteredModels);
-                    setVehicleModels(filteredModels);
+                    if (data.data && Array.isArray(data.data)) {
+                        const filteredModels = data.data.filter(model => model.vehicleDataId == typeId);
+                        setVehicleModels(filteredModels);
+                    }
 
                     // Reset vehicle model when type changes
-                    formik.setFieldValue('vehicleModelId', '');
+                    // formik.setFieldValue('vehicleModelId', '');
                 } catch (error) {
-                    console.log(error);
+                    console.error("Error fetching vehicle models:", error);
+                    toast.error("Error loading vehicle models. Please try again.");
                 }
             }
         };
         fetchVehicleModels();
     }, [formik.values.vehicleTypeId]);
 
-    // Reset vehicle availability when selection changes
     useEffect(() => {
         setVehicleAvailable(null);
     }, [formik.values.vehicleModelId, formik.values.dateRange]);
 
-    // Convert vehicle types to radio card options format
     const getVehicleTypeOptions = () => {
         return vehicleTypes.map(type => ({
             value: type.id.toString(),
             label: type.name,
             description: `${type.wheelCount}-wheel vehicle type`,
-            image: type.placeImg != "" && type.placeImg != undefined ? type.placeImg : type.wheelCount == 4 ? `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` : `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
+            image: type.placeImg && type.placeImg !== "" ? type.placeImg :
+                type.wheelCount == 4 ?
+                    `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` :
+                    `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
         }));
     };
 
-    // Convert vehicle models to radio card options format
     const getVehicleModelOptions = () => {
         return vehicleModels.map(model => ({
             value: model.id.toString(),
             label: `${model.company} ${model.model}`,
             description: `Released: ${model.releasedIn} - Daily Cost: $${model.dailyCost}`,
-            image: model.placeImg != "" && model.placeImg != undefined ? model.placeImg : model.VehicleDatum.wheelCount == 4 ? `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` : `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
+            image: model.VehicleImg && model.VehicleImg !== "" ? model.VehicleImg :
+                model.VehicleDatum && model.VehicleDatum.wheelCount == 4 ?
+                    `https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg` :
+                    `https://www.algonquinequipment.ca/wp-content/uploads/2017/11/moto-placeholder.png`,
         }));
     };
 
@@ -353,8 +313,8 @@ const BookingForm = () => {
                 // Date range step
                 if (formik.values.dateRange[0] && formik.values.dateRange[1] && !formik.errors.dateRange) {
                     // Check vehicle availability before proceeding
-                    await checkVehicleAvailability();
-                    canProceed = true;
+                    const available = await checkVehicleAvailability();
+                    canProceed = available !== false; // Proceed as long as it's not explicitly false
                 }
                 break;
             case 5:
@@ -371,7 +331,6 @@ const BookingForm = () => {
         if (canProceed) {
             setActiveStep(activeStep + 1);
         } else {
-            // Mark fields as touched to show validation errors
             switch (activeStep) {
                 case 0:
                     formik.setFieldTouched('firstName', true);
@@ -472,11 +431,9 @@ const BookingForm = () => {
                 );
 
             case 5:
-                // Confirmation step with availability status
                 const selectedType = vehicleTypes.find(type => type.id === parseInt(formik.values.vehicleTypeId));
                 const selectedModel = vehicleModels.find(model => model.id === parseInt(formik.values.vehicleModelId));
 
-                // Convert date objects to strings if needed
                 let startDate = formik.values.dateRange[0];
                 let endDate = formik.values.dateRange[1];
 
@@ -564,8 +521,7 @@ const BookingForm = () => {
                     Vehicle Booking
                 </Typography>
 
-                <div className=''>
-
+                <div>
                     <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
                         {steps.map((label) => (
                             <Step key={label}>
@@ -597,7 +553,6 @@ const BookingForm = () => {
                         )}
                         <Box sx={{ flex: '1 1 auto' }} />
 
-                        {/* Next/Check/Submit Button */}
                         {(activeStep < 5 || (activeStep === 5 && vehicleAvailable === true)) && (
                             <Button
                                 variant="contained"
@@ -612,9 +567,9 @@ const BookingForm = () => {
                                 {isSubmitting || isCheckingAvailability ? (
                                     <CircularProgress size={24} sx={{ color: 'white' }} />
                                 ) : activeStep === 4 ? (
-                                    <div>Check Availability</div>
+                                    "Check Availability"
                                 ) : activeStep === 5 ? (
-                                    <div>Complete Booking</div>
+                                    "Complete Booking"
                                 ) : (
                                     'Next'
                                 )}

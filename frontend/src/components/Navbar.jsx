@@ -70,8 +70,8 @@ const Navbar = () => {
                         <NavLink to="/" className={location.pathname === '/' ? 'nav-link' : ''}>
                             Home
                         </NavLink>
-                        <NavLink to="/about" className={location.pathname === '/about' ? 'nav-link' : ''}>
-                            About
+                        <NavLink to="/bookings" className={location.pathname === '/bookings' ? 'nav-link' : ''}>
+                            Bookings
                         </NavLink>
                         <NavLink to="/contact" className={location.pathname === '/contact' ? 'nav-link' : ''}>
                             Contact

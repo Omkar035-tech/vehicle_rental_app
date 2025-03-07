@@ -1,83 +1,10 @@
 import { Booking, VehicleInfo } from '../models/index.js';
 import { Op } from 'sequelize';
 
-// export const checkAvailability = async (req, res) => {
-//     try {
-//         const { vehicleId, startDate, endDate } = req.query;
-//         console.log(vehicleId, startDate, endDate)
-//         if (!vehicleId || !startDate || !endDate) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: 'Vehicle ID, start date and end date are required'
-//             });
-//         }
-
-//         // Convert to Date objects
-//         const start = new Date(startDate);
-//         const end = new Date(endDate);
-
-//         // Validate date range
-//         if (start >= end) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: 'End date must be after start date'
-//             });
-//         }
-
-//         // Check if the vehicle exists
-//         const vehicle = await VehicleInfo.findByPk(vehicleId);
-//         console.log(vehicle)
-//         if (!vehicle) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: 'Vehicle not found'
-//             });
-//         }
-
-//         // Check for overlapping bookings
-//         const overlappingBookings = await Booking.findAll({
-//             where: {
-//                 vehicleId,
-//                 status: 'CONFIRMED', // Only check confirmed bookings
-//                 [Op.or]: [
-//                     {
-//                         startDate: {
-//                             [Op.lte]: end
-//                         },
-//                         endDate: {
-//                             [Op.gte]: start
-//                         }
-//                     }
-//                 ]
-//             }
-//         });
-
-//         const isAvailable = overlappingBookings.length === 0;
-
-//         return res.status(200).json({
-//             success: true,
-//             data: {
-//                 vehicle,
-//                 isAvailable,
-//                 overlappingBookings: isAvailable ? [] : overlappingBookings
-//             }
-//         });
-//     } catch (error) {
-//         console.error('Error checking availability:', error);
-//         return res.status(500).json({
-//             success: false,
-//             message: 'Failed to check availability',
-//             error: error.message
-//         });
-//     }
-// };
-
-//Create a new booking
-
 export const checkAvailability = async (req, res) => {
     try {
         const { vehicleId, startDate, endDate } = req.query;
-        console.log(vehicleId, startDate, endDate);
+
         if (!vehicleId || !startDate || !endDate) {
             return res.status(400).json({
                 success: false,
@@ -221,14 +148,11 @@ export const createBooking = async (req, res) => {
             });
         }
 
-        // Calculate rental duration in days
         const durationMs = end.getTime() - start.getTime();
         const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
 
-        // Calculate total price
-        const totalPrice = durationDays * parseFloat(vehicle.dailyRate);
-
-        // Create new booking
+        const totalPrice = durationDays * parseFloat(vehicle.dailyCost);
+        console.log(durationMs, durationDays, totalPrice, vehicle)
         const booking = await Booking.create({
             vehicleId,
             startDate: start,
@@ -302,6 +226,60 @@ export const getBookingById = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Failed to fetch booking',
+            error: error.message
+        });
+    }
+};
+
+// for ride cancleation
+
+export const cancelBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const booking = await Booking.findByPk(id);
+
+        if (!booking) {
+            return res.status(404).json({
+                success: false,
+                message: 'Booking not found'
+            });
+        }
+
+        if (booking.status === 'CANCELLED') {
+            return res.status(400).json({
+                success: false,
+                message: 'Booking is already cancelled'
+            });
+        }
+
+        const currentDate = new Date();
+        if (new Date(booking.startDate) < currentDate) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot cancel a booking that has already started'
+            });
+        }
+
+        booking.status = 'CANCELLED';
+
+        // booking.cancelledAt = new Date();
+        if (req.body.reason) {
+            booking.cancellationReason = req.body.reason;
+        }
+
+        // Save the changes
+        await booking.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Booking cancelled successfully',
+            data: booking
+        });
+    } catch (error) {
+        console.error('Error cancelling booking:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to cancel booking',
             error: error.message
         });
     }

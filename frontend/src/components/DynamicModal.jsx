@@ -18,7 +18,7 @@ const DynamicModal = ({ isOpen, onClose, onSubmit, title, fields }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="absolute z-50 inset-0 bg-[#0000004a] bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed z-50 inset-0 bg-[#0000004a] bg-opacity-50 flex items-center justify-center p-0">
             <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
                 <h2 className="text-xl font-bold mb-4">{title}</h2>
                 <form onSubmit={handleSubmit}>
