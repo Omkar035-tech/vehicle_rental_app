@@ -14,7 +14,7 @@ const VehicleBookings = () => {
 
     const handleSubmit = async (id) => {
         console.log(id)
-        const response = await fetch(`http://localhost:3001/api/bookings/cancel/${id}`, {
+        const response = await fetch(`https://vehiclerentalapp-production.up.railway.app/api/bookings/cancel/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ const VehicleBookings = () => {
     const fetchBookings = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:3001/api/bookings');
+            const response = await fetch('https://vehiclerentalapp-production.up.railway.app/api/bookings');
             if (!response.ok) {
                 throw new Error('Failed to fetch bookings');
             }

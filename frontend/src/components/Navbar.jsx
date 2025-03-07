@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { CirclePlus } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import DynamicModal from './DynamicModal';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Navbar = () => {
     const location = useLocation();
@@ -30,7 +31,7 @@ const Navbar = () => {
 
     const fetchVehicleTypes = async () => {
         try {
-            const response = await fetch("http://localhost:3001/api/vehicles/types");
+            const response = await fetch("https://vehiclerentalapp-production.up.railway.app/api/vehicles/types");
             const data = await response.json();
 
             if (data.data && Array.isArray(data.data)) {
@@ -82,7 +83,7 @@ const Navbar = () => {
             placeImg: formData.vehiclePlaceholder,
         }
 
-        const response = await fetch("http://localhost:3001/api/vehicles/create", {
+        const response = await fetch("https://vehiclerentalapp-production.up.railway.app/api/vehicles/create", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -91,13 +92,14 @@ const Navbar = () => {
         });
         const data = await response.json();
         if (data.status) {
-            // Handle successful submission
+            toast.success(data.message)
             setIsModalOpen(false);
         }
     };
 
     return (
         <div>
+            <ToastContainer position="top-right" autoClose={5000} />
             <div className="flex justify-between items-center p-4 bg-gray-100 mx-7 my-5 rounded-xl nav">
                 <div className="flex items-center space-x-12 justify-between">
                     <img
@@ -129,7 +131,7 @@ const Navbar = () => {
                         }}
                         className="bg-black flex justify-center items-center text-white hover:bg-gray-800 rounded-xl outline-0 font-semibold px-4 py-3"
                     >
-                        <CirclePlus size={18} className="mr-2 cursor-pointer" /> Add Vehicle
+                        <CirclePlus size={18} className="mr-2 cursor-pointer" /> Insert Vehicle Data
                     </button>
                 </div>
             </div>
