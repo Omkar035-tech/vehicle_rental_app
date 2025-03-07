@@ -8,7 +8,7 @@ export const getVehicleTypes = async (req, res) => {
         console.log(wheelCount)
         const vehicleTypes = await VehicleData.findAll({
             where: wheelCount ? { wheelCount: wheelCount } : {},
-            attributes: ['id', 'name', 'wheelCount']
+            attributes: ['id', 'name', 'wheelCount', 'placeImg']
         });
 
         return res.status(200).json({
@@ -121,12 +121,13 @@ export const getVehicleInfoById = async (req, res) => {
 
 export const createVehicle = async (req, res) => {
     try {
-        const { name, wheelCount, model, company, releasedIn, dailyCost } = req.body;
+        const { name, wheelCount, model, company, releasedIn, dailyCost, placeImg, VehicleImg } = req.body;
         console.log(req.body)
 
         const vehicleData = await VehicleData.create({
             name,
-            wheelCount
+            wheelCount,
+            placeImg
         });
 
         const vehicleInfo = await VehicleInfo.create({
@@ -134,11 +135,13 @@ export const createVehicle = async (req, res) => {
             company,
             releasedIn,
             dailyCost,
+            VehicleImg,
             vehicleDataId: vehicleData.id
         });
 
         res.status(201).json({
             message: 'Vehicle created successfully',
+            status: true,
             vehicle: {
                 ...vehicleInfo.toJSON(),
                 vehicleData: vehicleData.toJSON()
@@ -148,6 +151,7 @@ export const createVehicle = async (req, res) => {
         console.error('Error creating vehicle:', error);
         res.status(500).json({
             message: 'Error creating vehicle',
+            status: false,
             error: error.message
         });
     }

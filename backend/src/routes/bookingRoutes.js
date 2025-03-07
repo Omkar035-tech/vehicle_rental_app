@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkAvailability, createBooking, getAllBookings, getBookingById } from "../controllers/bookingcontroller.js";
+import { checkAvailability, createBooking, getAllBookings, getBookingById, cancelBooking } from "../controllers/bookingcontroller.js";
 import { validateAvailabilityCheck, validateBookingInput, validateIdParam, } from "../middlewares/validation.js"
 const router = express.Router();
 /**
@@ -29,5 +29,12 @@ router.get('/', getAllBookings);
  * @access  Public
  */
 router.get('/:id', validateIdParam, getBookingById);
+
+/**
+ * @route   GET /api/bookings/cancel/:id
+ * @desc    cancle ride booking by ID
+ * @access  Public
+ */
+router.get('/cancel/:id', cancelBooking);
 
 export default router;

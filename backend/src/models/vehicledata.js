@@ -15,6 +15,10 @@ const VehicleData = (sequelize) => {
         wheelCount: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        placeImg: {
+            type: DataTypes.STRING,
+            allowNull: false,
         }
     }, {
         tableName: 'vehicle_data'

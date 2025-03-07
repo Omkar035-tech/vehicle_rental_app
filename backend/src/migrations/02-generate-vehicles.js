@@ -40,6 +40,10 @@ export default {
             updatedAt: {
                 allowNull: false,
                 type: Sequelize.DATE
+            },
+            VehicleImg: {
+                type: Sequelize.STRING,
+                allowNull: false
             }
         });
         await queryInterface.addIndex('vehicle_info', ['vehicleDataId']);
