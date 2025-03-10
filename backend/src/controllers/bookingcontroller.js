@@ -130,10 +130,10 @@ export const createBooking = async (req, res) => {
                     {
                         // Start date falls within existing booking
                         startDate: {
-                            [Op.lte]: end
+                            [Op.lt]: end
                         },
                         endDate: {
-                            [Op.gte]: start
+                            [Op.gt]: start
                         }
                     }
                 ]
