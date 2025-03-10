@@ -12,11 +12,9 @@ export const checkAvailability = async (req, res) => {
             });
         }
 
-        // Convert to Date objects
         const start = new Date(startDate);
         const end = new Date(endDate);
 
-        // Validate date range
         if (start >= end) {
             return res.status(400).json({
                 success: false,
@@ -24,7 +22,6 @@ export const checkAvailability = async (req, res) => {
             });
         }
 
-        // Check if the vehicle exists
         const vehicle = await VehicleInfo.findByPk(vehicleId);
         if (!vehicle) {
             return res.status(404).json({
@@ -33,37 +30,40 @@ export const checkAvailability = async (req, res) => {
             });
         }
 
-        // Check for overlapping bookings
         const overlappingBookings = await Booking.findAll({
             where: {
                 vehicleId,
-                status: 'CONFIRMED', // Only check confirmed bookings
+                status: 'CONFIRMED',
                 [Op.or]: [
                     {
-                        startDate: {
-                            [Op.lt]: end
-                        },
-                        endDate: {
-                            [Op.gt]: start
-                        }
+
+                        [Op.and]: [
+                            {
+                                startDate: {
+                                    [Op.lt]: end
+                                }
+                            },
+                            {
+                                endDate: {
+                                    [Op.gt]: start
+                                }
+                            }
+                        ]
                     }
                 ]
             }
         });
 
         const isAvailable = overlappingBookings.length === 0;
-
-        // Calculate total price
         const durationMs = end.getTime() - start.getTime();
         const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
         const totalPrice = durationDays * parseFloat(vehicle.dailyCost);
 
-        // Prepare the response with required fields
         const responseData = {
             model: vehicle.model,
             company: vehicle.company,
             releasedIn: vehicle.releasedIn,
-            totalPrice: totalPrice.toFixed(2), // Format to 2 decimal places
+            totalPrice: totalPrice.toFixed(2),
             isAvailable,
             overlappingBookings: isAvailable ? [] : overlappingBookings
         };
@@ -92,7 +92,6 @@ export const createBooking = async (req, res) => {
             customerLastName
         } = req.body;
 
-        // Validate required fields
         if (!vehicleId || !startDate || !endDate || !customerFirstName || !customerLastName) {
             return res.status(400).json({
                 success: false,
@@ -100,11 +99,9 @@ export const createBooking = async (req, res) => {
             });
         }
 
-        // Convert to Date objects
         const start = new Date(startDate);
         const end = new Date(endDate);
 
-        // Validate date range
         if (start >= end) {
             return res.status(400).json({
                 success: false,
@@ -112,7 +109,6 @@ export const createBooking = async (req, res) => {
             });
         }
 
-        // Check if the vehicle exists
         const vehicle = await VehicleInfo.findByPk(vehicleId);
         if (!vehicle) {
             return res.status(404).json({
@@ -121,17 +117,17 @@ export const createBooking = async (req, res) => {
             });
         }
 
-        // Check for overlapping bookings
         const overlappingBookings = await Booking.findAll({
             where: {
                 vehicleId,
-                status: 'CONFIRMED', // Only check confirmed bookings
-                [Op.or]: [
+                status: 'CONFIRMED',
+                [Op.and]: [
                     {
-                        // Start date falls within existing booking
                         startDate: {
                             [Op.lt]: end
-                        },
+                        }
+                    },
+                    {
                         endDate: {
                             [Op.gt]: start
                         }
